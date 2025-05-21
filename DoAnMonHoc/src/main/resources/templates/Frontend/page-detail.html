@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title th:text="${page.title}">Trang</title>
+  <link rel="stylesheet" href="/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container my-5">
+  <h1 th:text="${page.title}">Tiêu đề</h1>
+  <p class="text-muted" th:text="${page.mota}">Mô tả</p>
+  <hr>
+  <div th:utext="${contentHtml}">Nội dung</div>
+</div>
+</body>
+</html>
