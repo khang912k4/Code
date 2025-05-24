@@ -1,0 +1,12 @@
+.btn-block{
+    height: 20px;
+    width: 20px;
+}
+.rows{
+    display: flex;
+    margin: 10px;
+}
+.khoang-cach{
+    display: flex;
+    justify-content: space-between;
+}

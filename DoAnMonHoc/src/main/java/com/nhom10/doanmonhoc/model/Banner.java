@@ -13,7 +13,7 @@ public class Banner {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_banner")
-    private Long id;
+    private Long idBanner;
 
     @Column(name = "anh")
     private String image;
@@ -21,6 +21,6 @@ public class Banner {
     private String mota;
 
     @Column(name = "id_site")
-    private Long idPage;
+    private Long idSite;
 
 }

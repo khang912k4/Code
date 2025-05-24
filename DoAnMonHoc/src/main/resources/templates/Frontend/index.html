@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trường Đại học Nha Trang</title>
+    <title th:text="${site.getName()}"></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="/css/Frontend/style.css">
@@ -44,15 +44,15 @@
                         >Trang chủ</a>
                     </li>
                     <li  class="nav-item">
-                        <a href="tin-tuc" class="nav-link fw-bold text-white"
+                        <a th:href="@{'/tin-tuc/'+${id}}" class="nav-link fw-bold text-white"
                         >Tin tức</a>
                     </li>
                     <li th:each="menu : ${menus}"
-                        th:if="${menuToPageMap[menu.id] != null}"
+                        th:if="${menuToPageMap[menu.idMenu] != null}"
                         class="nav-item">
                         <a class="nav-link fw-bold text-white"
                            target="_blank"
-                           th:href="@{'/page/' + ${menuToPageMap[menu.id]}}"
+                           th:href="@{'/page/' + ${menuToPageMap[menu.idMenu]}}"
                            th:text="${menu.name}"></a>
                     </li>
 
@@ -69,9 +69,7 @@
 
 <!-- Carousel Banner -->
 <div th:if="${bannerList.size() == 1}">
-    <a th:href="${bannerList[0].link}" >
-        <img th:src="${bannerList[0].image}" th:title="${banner.tooltip}" class="d-block w-100" alt="Banner">
-    </a>
+    <img th:src="${bannerList[0].image}" th:title="${banner.tooltip}" class="d-block w-100" alt="Banner">
 </div>
 
 <div th:if="${bannerList.size() > 1}" id="mainCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="4000">
@@ -92,7 +90,7 @@
 <section class="news-section news-section-post">
     <div class="container">
         <h2 class="section-title">TIN TỨC</h2>
-        <a href="/tin-tuc" class="">Xem tất cả</a>
+        <a th:href="@{'/tin-tuc/' + ${site.idSite}}" class="">Xem tất cả</a>
         <div class="news-card" th:each="post : ${posts}">
             <a th:href="@{'/post/' + ${post.id}}" target="_blank" th:title="${post.tooltip}">
                 <img th:src="${post.image}" alt="Tin nổi bật" class="img-fluid">

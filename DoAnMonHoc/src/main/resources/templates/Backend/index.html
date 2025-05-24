@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Trường Đại học Nha Trang</title>
+  <title th:text="@{${site.getName()} +'_edit'}"></title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="stylesheet" href="/css/Backend/style.css">
@@ -19,10 +19,8 @@
       Posts
     </button>
     <ul class="dropdown-menu" style="">
-      <li><a class="dropdown-item" href="#">All Posts</a></li>
-      <li><a class="dropdown-item" href="#">Add Post</a></li>
-      <li><a class="dropdown-item" href="#">Categories</a></li>
-      <li><a class="dropdown-item" href="#">Tags</a></li>
+      <li><a class="dropdown-item" th:href="@{'/allpost/'+${site.idSite}}">All Posts</a></li>
+      <li><a class="dropdown-item" th:href="@{'/addpost/'+${site.idSite}}">Add Post</a></li>
     </ul>
   </div>
   <div class="btn-group dropend" role="group">

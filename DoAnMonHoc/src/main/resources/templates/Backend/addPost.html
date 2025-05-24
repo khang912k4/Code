@@ -12,9 +12,13 @@
     <form th:action="@{/addpost}" method="post">
         <textarea rows="1" cols="50" placeholder="Add title" name="title"></textarea><br>
         <div id="allblock" name="allblock">
-            <textarea rows="1" cols="30" placeholder="Type/to choose a block" name="block"></textarea><br>
+            <textarea rows="1" cols="30" placeholder="Type/to choose a block" name="block"></textarea>
+            <button type="button" class="btn btn-secondary" data-bs-container="body" data-bs-toggle="popover" data-bs-placement="bottom" data-bs-content="Bottom popover">
+                +
+            </button>
+            <br>
         </div>
-        <button>Publish</button>
+        <button id="btn-publish" name="btn-publish">Publish</button>
     </form>
 </body>
 <script>
@@ -26,7 +30,11 @@
             if(event.target.name==="block"){
                 event.target.value = event.target.value.replace(/[\r\n\v]+/g, '')
                 const div = document.createElement("div");
-                div.innerHTML='<textarea rows="1" cols="30" placeholder="Type/to choose a block" name="block"></textarea><br>';
+                div.innerHTML='<textarea rows="1" cols="30" placeholder="Type/to choose a block" name="block"></textarea>\n' +
+                    '            <button type="button" class="btn btn-secondary" data-bs-container="body" data-bs-toggle="popover" data-bs-placement="bottom" data-bs-content="Bottom popover">\n' +
+                    '                +\n' +
+                    '            </button>\n' +
+                    '            <br>';
                 document.getElementById("allblock").appendChild(div);
             }
         }

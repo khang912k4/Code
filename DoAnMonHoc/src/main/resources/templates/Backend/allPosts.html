@@ -11,7 +11,7 @@
 </head>
 <body>
   <h1>Posts</h1>
-  <a href="/addpost" class="addps">Add Post</a>
+  <a th:href="@{'/addpost/'+${site.getIdSite()}}" class="addps">Add Post</a>
   <br>
   <a href="#">All</a>
   <a href="#">Published</a>
@@ -19,19 +19,14 @@
   <a href="#">Private</a>
   <a href="#">Trash</a>
   <br>
-  <div class="container">
-    <div class="row">
-      <div class="col-md-4 mb-4" th:each="post : ${posts}">
-        <a th:href="${post.link}" th:title="${post.tooltip}" target="_blank" class="card h-100 border-0 text-decoration-none text-dark">
-          <img th:src="${post.image}" class="card-img-top news-img" alt="Tin nổi bật"
-               style="height: 220px; object-fit: cover;">
-          <div class="card-body">
-            <h6 class="card-title fw-semibold" th:text="${post.title}"></h6>
-            <p class="text-muted small" th:text="${post.timeAgo}"></p>
-          </div>
-        </a>
-      </div>
+  <div class="cols" th:each="post : ${posts}">
+    <div class="rows">
+      <img th:src="${post.image}" alt="Tin nổi bật"
+           style="height: 100px; object-fit: cover;">
+      <a th:href="${post.link}" th:title="${post.tooltip}" target="_blank">
+        <h6 th:text="${post.title}"></h6>
+      </a>
+      <p th:text="${post.timeAgo}"></p>
     </div>
-  </div>
 </body>
 </html>

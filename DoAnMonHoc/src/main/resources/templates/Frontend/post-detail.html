@@ -35,10 +35,9 @@
     <div><i class="bi bi-calendar"></i> <span th:text="${timeAgo}">Ngày đăng</span></div>
     <div><i class="bi bi-person"></i> Người đăng: <span th:text="${authorName}">Admin</span></div>
   </div>
-
-  <img th:src="${post.image}" alt="Ảnh bài viết" class="post-image"/>
-
-  <div class="post-content" th:utext="${contentHtml}">
+  <div class="post-content" th:each="block: ${contentHtml}">
+    <div th:utext="${block.code}">
+    </div>
   </div>
 </div>
 

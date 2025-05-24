@@ -9,10 +9,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
-    @Query("SELECT p FROM Post p WHERE p.status = :status ORDER BY p.pined DESC, p.createdAt DESC")
-    List<Post> findPublishedPostsOrderByPined(@Param("status") PostStatus status);
-
-
-
-
+    @Query("SELECT p FROM Post p WHERE p.idSite = :id AND p.status = :status ORDER BY p.pined DESC,p.createdAt DESC")
+    List<Post> findPublishedPostsByIdSiteOrderByPined(Long id,@Param("status") PostStatus status);
+    Post findTopByOrderByIdPostDesc();
 }

@@ -17,11 +17,11 @@ public class PostService {
         entityManager.createNativeQuery(
                         "INSERT INTO post (title,status,created_by,mota,pined,id_site,image) VALUES (?,?,?,?,?,?,?)")
                 .setParameter(1, post.getTitle())
-                .setParameter(2, "Published")
-                .setParameter(3, 6)
-                .setParameter(4, "uiauia")
-                .setParameter(5, false)
-                .setParameter(6,1)
+                .setParameter(2, post.getStatus())
+                .setParameter(3, post.getCreatedBy())
+                .setParameter(4, post.getMota())
+                .setParameter(5, post.getPined())
+                .setParameter(6,post.getIdSite())
                 .setParameter(7,"https://khoacntt.ntu.edu.vn/uploads/54/images/news/6789/img/sinh-vien-cac-cac-lop-chat-luong-cao-va-he-thong-thong-tin-quan-ly-kien-tap-tai-t.jpg")
                 .executeUpdate();
     }
