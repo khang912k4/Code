@@ -2,21 +2,30 @@
 :root {
     --primary-color: #4ab7e9;
 }
-
 .top-header {
     background: white;
     color: black;
     padding: 5px 0;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
 }
 
 .main-header {
     padding: 15px 0;
+    position: fixed;
+    top: 75px;
+    width: 100%;
+    z-index: 1000;
 }
 
 .logo img {
     max-height: 80px;
 }
-
+.banner{
+    height: 170px;
+}
 .nav-item .nav-link {
     color: #333;
     font-weight: 500;

@@ -36,8 +36,6 @@ public class Post {
 
     private Boolean pined;
 
-    private String image;
-
     @Column(name = "id_site")
     private Long idSite;
 }

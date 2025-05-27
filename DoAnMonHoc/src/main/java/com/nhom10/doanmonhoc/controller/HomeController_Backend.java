@@ -2,9 +2,9 @@ package com.nhom10.doanmonhoc.controller;
 
 import com.nhom10.doanmonhoc.enums.PostStatus;
 import com.nhom10.doanmonhoc.model.*;
-import com.nhom10.doanmonhoc.repository.PostRepository;
-import com.nhom10.doanmonhoc.repository.SiteRepository;
+import com.nhom10.doanmonhoc.repository.*;
 import com.nhom10.doanmonhoc.service.*;
+import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,6 +16,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 
 @Controller
 public class HomeController_Backend {
@@ -29,8 +33,14 @@ public class HomeController_Backend {
     private SiteRepository siteRepository;
     @Autowired
     private SiteService siteService;
+    @Autowired
+    private PageRepository pageRepository;
+    @Autowired
+    private BannerRepository bannerRepository;
+    @Autowired
+    private MenuRepository menuRepository;
 
-    @GetMapping("/allsite")
+    @GetMapping("/")
     public String sites(Model model) {
         List<Map<String,String>> sites = new ArrayList<>();
         for (Site s: siteRepository.findAllByOrderByIdSiteAsc()){
@@ -44,11 +54,18 @@ public class HomeController_Backend {
         model.addAttribute("sites", sites);
         return "Backend/allSites";
     }
-    @PostMapping("/allsite")
-    public String allSites(Model model,@RequestParam(value = "btn-add",required = false) String cl) {
-        if(!Objects.equals(cl, null)){
+    @PostMapping("/")
+    public String allSites(Model model,@RequestParam(value = "btn-add",required = false) String cl) throws IOException {
+        if(!Objects.equals(cl, null)) {
+            String str_b = "";
+            BufferedImage img = ImageIO.read(new File("/Users/khang912k4/Documents/DoAnMonHoc/src/main/resources/static/image/output.jpg"));
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageIO.write(img, "jpg", baos);
+            byte[] b = baos.toByteArray();
+            str_b = Arrays.toString(b);
             Site site = new Site();
             site.setName("My Site Style");
+            site.setLogo(str_b);
             siteService.insertSiteNative(site);
         }
         List<Map<String,String>> sites = new ArrayList<>();
@@ -62,6 +79,101 @@ public class HomeController_Backend {
         }
         model.addAttribute("sites", sites);
         return "Backend/allSites";
+    }
+    @GetMapping("/editsite/{id}")
+    public String editSite(@PathVariable("id") Long id, Model model) {
+        Optional<Site> siteOpt = siteRepository.findById(id);
+        if (siteOpt.isEmpty()) return "redirect:/";
+
+        Site site = siteOpt.get();
+
+        List<Banner> banners = bannerRepository.findByIdSiteOrderByIdBannerAsc(site.getIdSite());
+        List<Map<String, String>> bannerList = new ArrayList<>();
+        for (Banner b : banners) {
+            Map<String, String> bannerMap = new HashMap<>();
+            bannerMap.put("image", b.getImage());
+            bannerMap.put("tooltip", b.getMota());
+            bannerList.add(bannerMap);
+        }
+        model.addAttribute("bannerList", bannerList);
+        List<Menu> menus = menuRepository.findByIdSiteOrderByIdMenuAsc(site.getIdSite());
+        model.addAttribute("menus", menus);
+        model.addAttribute("site", site);
+        List<Post> allPosts = postRepository.findPublishedPostsByIdSiteOrderByPined(site.getIdSite(),PostStatus.Published);
+        List<Map<String, String>> posts = new ArrayList<>();
+        if (!allPosts.isEmpty()) {
+            Post p = allPosts.get(0);
+            Map<String, String> postMap = new HashMap<>();
+            postMap.put("id", String.valueOf(p.getIdPost()));
+            postMap.put("title", p.getTitle());
+            postMap.put("image", "https://xdcs.cdnchinhphu.vn/446259493575335936/2024/8/17/nhatrang1-17238902889991160055539.jpg");
+            postMap.put("tooltip", p.getMota());
+            postMap.put("timeAgo", getTimeAgo(p.getCreatedAt()));
+            postMap.put("link", "/post/" + p.getIdPost());
+            posts.add(postMap);
+        }
+        model.addAttribute("posts", posts);
+
+        List<Page> allPages = pageRepository.findAll();
+        Map<Long, Long> menuToPageMap = new HashMap<>();
+        for (Page page : allPages) {
+            if ("Published".equalsIgnoreCase(page.getStatus())) {
+                menuToPageMap.put(page.getIdMenu(), page.getIdPage());
+            }
+        }
+        model.addAttribute("menuToPageMap", menuToPageMap);
+        return "Backend/editSite";
+    }
+    @PostMapping("/editsite/{id}")
+    public String editSites(
+            @PathVariable("id") Long id,
+            @RequestParam(value = "logo",required = false) String logo,
+            Model model) {
+        Optional<Site> siteOpt = siteRepository.findById(id);
+        if (siteOpt.isEmpty()) return "redirect:/";
+
+        Site site = siteOpt.get();
+
+        if(logo != null){
+            System.out.println(logo);
+        }
+        List<Banner> banners = bannerRepository.findByIdSiteOrderByIdBannerAsc(site.getIdSite());
+        List<Map<String, String>> bannerList = new ArrayList<>();
+        for (Banner b : banners) {
+            Map<String, String> bannerMap = new HashMap<>();
+            bannerMap.put("image", b.getImage());
+            bannerMap.put("tooltip", b.getMota());
+            bannerList.add(bannerMap);
+        }
+        model.addAttribute("bannerList", bannerList);
+        List<Menu> menus = menuRepository.findByIdSiteOrderByIdMenuAsc(site.getIdSite());
+        model.addAttribute("menus", menus);
+        model.addAttribute("site", site);
+        List<Post> allPosts = postRepository.findPublishedPostsByIdSiteOrderByPined(site.getIdSite(),PostStatus.Published);
+        List<Map<String, String>> posts = new ArrayList<>();
+        if (!allPosts.isEmpty()) {
+            Post p = allPosts.get(0);
+            Map<String, String> postMap = new HashMap<>();
+            postMap.put("id", String.valueOf(p.getIdPost()));
+            postMap.put("title", p.getTitle());
+            postMap.put("image", "https://xdcs.cdnchinhphu.vn/446259493575335936/2024/8/17/nhatrang1-17238902889991160055539.jpg");
+            postMap.put("tooltip", p.getMota());
+            postMap.put("timeAgo", getTimeAgo(p.getCreatedAt()));
+            postMap.put("link", "/post/" + p.getIdPost());
+            posts.add(postMap);
+        }
+        model.addAttribute("posts", posts);
+
+        List<Page> allPages = pageRepository.findAll();
+        Map<Long, Long> menuToPageMap = new HashMap<>();
+        for (Page page : allPages) {
+            if ("Published".equalsIgnoreCase(page.getStatus())) {
+                menuToPageMap.put(page.getIdMenu(), page.getIdPage());
+            }
+        }
+        model.addAttribute("menuToPageMap", menuToPageMap);
+
+        return "Backend/editSite";
     }
 
     @GetMapping("/back/{id}")
@@ -82,6 +194,7 @@ public class HomeController_Backend {
     }
     @GetMapping("/allpost/{id}")
     public String allPost(@PathVariable("id") Long id,Model model) {
+
         Optional<Site> siteOpt = siteRepository.findById(id);
         if (siteOpt.isEmpty()) return "redirect:/";
 
@@ -91,7 +204,7 @@ public class HomeController_Backend {
         for (Post p : postRepository.findPublishedPostsByIdSiteOrderByPined(id,PostStatus.Published)) {
             Map<String, String> postMap = new HashMap<>();
             postMap.put("title", p.getTitle());
-            postMap.put("image", p.getImage());
+            postMap.put("image", "https://xdcs.cdnchinhphu.vn/446259493575335936/2024/8/17/nhatrang1-17238902889991160055539.jpg");
             postMap.put("tooltip", p.getMota());
             postMap.put("timeAgo", getTimeAgo(p.getCreatedAt()));
             postMap.put("link", "/post/" + p.getIdPost());
@@ -145,6 +258,4 @@ public class HomeController_Backend {
         }
         return "Backend/addPost";
     }
-
-
 }

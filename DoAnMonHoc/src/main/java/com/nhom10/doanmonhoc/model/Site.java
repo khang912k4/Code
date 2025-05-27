@@ -20,6 +20,7 @@ public class Site {
     @Column(name = "site_name")
     private String name;
 
+    @Column(name ="logo")
     private String logo;
 
     @Column(name = "created_at")

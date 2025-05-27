@@ -1,71 +1,11 @@
 <!DOCTYPE html>
 <html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${site.getName()}"></title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link rel="stylesheet" href="/css/Frontend/style.css">
-
+<head th:replace="~{fragments/head :: head('Trang chủ')}"
+      th:with="pageCss='/css/Frontend/home.css'">
 </head>
 <body>
-
-<div class="top-header py-2 ">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-md-3 d-flex align-items-center">
-                <img  th:src="${site.logo}" alt="NTU Logo" style="height: 60px; margin-right: 10px;">
-            </div>
-
-            <div class="col-md-9 text-end">
-                <a href="#" class="text-black me-3">Tuyển dụng</a>
-                <a href="#" class="text-black me-3">Tài nguyên số</a>
-                <a href="#" class="text-black me-3">Email</a>
-                <a href="#" class="text-black me-3">Lịch công tác</a>
-                <a href="#" class="text-black me-3">Liên hệ</a>
-                <a href="#" class="text-black me-2"><i class="fas fa-search"></i></a>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Main Navigation -->
-<header class="main-header bg-dark">
-    <div class="container">
-        <nav class="navbar navbar-expand-lg navbar-dark">
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li  class="nav-item">
-                        <a href="#" class="nav-link fw-bold text-white"
-                        >Trang chủ</a>
-                    </li>
-                    <li  class="nav-item">
-                        <a th:href="@{'/tin-tuc/'+${id}}" class="nav-link fw-bold text-white"
-                        >Tin tức</a>
-                    </li>
-                    <li th:each="menu : ${menus}"
-                        th:if="${menuToPageMap[menu.idMenu] != null}"
-                        class="nav-item">
-                        <a class="nav-link fw-bold text-white"
-                           target="_blank"
-                           th:href="@{'/page/' + ${menuToPageMap[menu.idMenu]}}"
-                           th:text="${menu.name}"></a>
-                    </li>
-
-
-                </ul>
-
-            </div>
-        </nav>
-    </div>
-</header>
-
-
-
+<div th:replace="~{fragments/header :: header}"
+     th:with="site=${site}, menus=${menus}, menuToPageMap=${menuToPageMap}"></div>
 
 <!-- Carousel Banner -->
 <div th:if="${bannerList.size() == 1}">
@@ -84,8 +24,6 @@
     </div>
 </div>
 
-
-
 <!-- News Section -->
 <section class="news-section news-section-post">
     <div class="container">
@@ -93,13 +31,15 @@
         <a th:href="@{'/tin-tuc/' + ${site.idSite}}" class="">Xem tất cả</a>
         <div class="news-card" th:each="post : ${posts}">
             <a th:href="@{'/post/' + ${post.id}}" target="_blank" th:title="${post.tooltip}">
-                <img th:src="${post.image}" alt="Tin nổi bật" class="img-fluid">
+                <img th:src="${post.image}" alt="Tin nổi bật"  class="img-fluid">
                 <div style="display: flex; justify-content: space-between">
                     <p class="mt-2 fw-bold text-dark news-title" th:text="${post.title}"></p>
                     <p class="text-muted text-end small mt-1" th:text="${post.timeAgo}"></p>
                 </div>
             </a>
         </div>
+
+
 
 
         <!--            &lt;!&ndash; Cột 2: Carousel tin ảnh &ndash;&gt;-->
@@ -130,7 +70,6 @@
         <!--            </div>-->
     </div>
 </section>
-
 
 <!-- Events Section -->
 <section class="news-section bg-light">
@@ -187,5 +126,17 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const currentPath = window.location.pathname;
+        document.querySelectorAll(".navbar-nav .nav-link").forEach(link => {
+            const linkPath = link.getAttribute("href");
+            if (currentPath === linkPath || currentPath.startsWith(linkPath)) {
+                link.classList.add("active");
+            }
+        });
+    });
+</script>
+
 </body>
 </html>

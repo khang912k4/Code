@@ -17,7 +17,13 @@ public class SiteService {
         entityManager.createNativeQuery(
                         "INSERT INTO site (site_name,logo) VALUES (?,?)")
                 .setParameter(1, site.getName())
-                .setParameter(2, "https://i.pinimg.com/236x/85/40/33/854033242929cb15cd206e07b3981d58.jpg")
+                .setParameter(2, site.getLogo())
+                .executeUpdate();
+    }
+    public void editSite(Site site) {
+        entityManager.createNativeQuery("UPDATE site SET logo=? WHERE id=?")
+                .setParameter(1,site.getLogo())
+                .setParameter(2,site.getIdSite())
                 .executeUpdate();
     }
 }

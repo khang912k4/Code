@@ -26,6 +26,7 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.30'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    implementation 'org.imgscalr:imgscalr-lib:4.2'
 }
 
 tasks.named('test') {

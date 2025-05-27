@@ -43,7 +43,15 @@
       <li><a class="dropdown-item" href="#">Profile</a></li>
     </ul>
   </div>
-  <a href="#">Add New Site</a>
+  <div class="btn-group dropend" role="group">
+    <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+      Sites
+    </button>
+    <ul class="dropdown-menu" style="">
+      <li><a class="dropdown-item" th:href="@{'/editsite/'+${site.getIdSite()}}">Edit Site</a></li>
+      <li><a class="dropdown-item" href="#">Add New Site</a></li>
+    </ul>
+  </div>
 </div>
 <!-- Example Code End -->
 </body>
