@@ -1,6 +1,6 @@
 package com.nhom10.doanmonhoc.enums;
 
-public enum PostStatus {
+public enum Status {
     Published,
     Private,
     Pending_Review,

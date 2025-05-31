@@ -10,12 +10,12 @@
 </head>
 <body>
     <form th:action="@{/}" method="post">
-        <div class="rows">
+        <div class="rows-ck">
             <H2>Sites</H2>
             <button name="btn-add" id="btn-add">Add new site</button>
         </div>
     </form>
-    <div class="rows" th:each="site : ${sites}">
+    <div class="rows-ck" th:each="site : ${sites}">
         <a th:href="${site.link}" th:text="${site.site_name}" target="_blank"></a>
         <p th:text="${site.last_published}"></p>
         <a th:href="${site.link_edit}" target="_blank">Edit</a>

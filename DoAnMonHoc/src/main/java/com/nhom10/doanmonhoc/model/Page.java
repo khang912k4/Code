@@ -1,8 +1,12 @@
 package com.nhom10.doanmonhoc.model;
 
+import com.nhom10.doanmonhoc.enums.Status;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
+
 
 import java.time.LocalDateTime;
 
@@ -25,7 +29,9 @@ public class Page {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    private String status;
+    @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    private Status status;
 
     private String mota;
 

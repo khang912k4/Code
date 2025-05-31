@@ -1,9 +1,11 @@
 package com.nhom10.doanmonhoc.model;
 
-import com.nhom10.doanmonhoc.enums.PostStatus;
+import com.nhom10.doanmonhoc.enums.Status;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.time.LocalDateTime;
 
@@ -21,7 +23,8 @@ public class Post {
     private String title;
 
     @Enumerated(EnumType.STRING)
-    private PostStatus status;
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    private Status status;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -35,6 +38,7 @@ public class Post {
     private String mota;
 
     private Boolean pined;
+
 
     @Column(name = "id_site")
     private Long idSite;

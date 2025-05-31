@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-<th:block th:replace="fragments/head :: head(${page.title})"/>
+<head th:replace="~{Fragments/head_frontend :: head(${menu.name}, null)}"></head>
 <body>
-<div th:replace="fragments/header :: header"></div>
+<div th:replace="Fragments/header_frontend :: header"></div>
 
-<div class="container my-5">
+<div class="container my-5" style="margin-top: 13rem !important">
   <p class="text-muted" th:text="${page.mota}">Mô tả</p>
   <hr>
   <div th:each="item : ${contentHtml}">

@@ -27,6 +27,8 @@ dependencies {
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     implementation 'org.imgscalr:imgscalr-lib:4.2'
+    implementation 'org.hibernate.orm:hibernate-core:6.3.1.Final'
+
 }
 
 tasks.named('test') {

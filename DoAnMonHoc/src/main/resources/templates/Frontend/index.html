@@ -1,15 +1,14 @@
 <!DOCTYPE html>
 <html lang="vi">
-<head th:replace="~{fragments/head :: head('Trang chủ')}"
-      th:with="pageCss='/css/Frontend/home.css'">
-</head>
+<head th:replace="~{Fragments/head_frontend :: head('Trang chủ', '/css/Frontend/home.css')}"></head>
+
 <body>
-<div th:replace="~{fragments/header :: header}"
-     th:with="site=${site}, menus=${menus}, menuToPageMap=${menuToPageMap}"></div>
+<div th:replace="~{Fragments/header_frontend :: header}"></div>
+
 
 <!-- Carousel Banner -->
 <div th:if="${bannerList.size() == 1}">
-    <img th:src="${bannerList[0].image}" th:title="${banner.tooltip}" class="d-block w-100" alt="Banner">
+    <img th:src="${bannerList[0].image}" th:title="${bannerList[0].tooltip}" class="d-block w-100" alt="Banner">
 </div>
 
 <div th:if="${bannerList.size() > 1}" id="mainCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="4000">

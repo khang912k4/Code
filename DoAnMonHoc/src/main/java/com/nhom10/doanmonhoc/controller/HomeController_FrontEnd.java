@@ -1,6 +1,6 @@
 package com.nhom10.doanmonhoc.controller;
 
-import com.nhom10.doanmonhoc.enums.PostStatus;
+import com.nhom10.doanmonhoc.enums.Status;
 import com.nhom10.doanmonhoc.model.*;
 import com.nhom10.doanmonhoc.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,18 +8,20 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 
 @Controller
 public class HomeController_FrontEnd {
@@ -45,49 +47,6 @@ public class HomeController_FrontEnd {
     @Autowired
     private PageRepository pageRepository;
 
-    //    @GetMapping("/")
-//    public String showHomePage(Model model) {
-//        List<Banner> banners = bannerRepository.findAllByOrderByIdBannerAsc();
-//        List<Map<String, String>> bannerList = new ArrayList<>();
-//        for (Banner b : banners) {
-//            Map<String, String> bannerMap = new HashMap<>();
-//            bannerMap.put("image", b.getImage());
-//            bannerMap.put("tooltip", b.getMota());
-//            bannerMap.put("link", b.getIdSite() != null ? "/page/" + b.getIdSite() : "#");
-//            bannerList.add(bannerMap);
-//        }
-//        model.addAttribute("bannerList", bannerList);
-//        List<Menu> menus = menuRepository.findByIdSiteOrderByIdMenuAsc(1L);
-//        model.addAttribute("menus", menus);
-//        Site site = siteRepository.findFirstByOrderByIdSiteAsc();
-//        model.addAttribute("site", site);
-//        List<Post> allPosts = postRepository.findPublishedPostsOrderByPined(PostStatus.Published);
-//        List<Map<String, String>> posts = new ArrayList<>();
-//        if (!allPosts.isEmpty()) {
-//            Post p = allPosts.get(0);
-//            Map<String, String> postMap = new HashMap<>();
-//            postMap.put("id", String.valueOf(p.getIdPost()));
-//            postMap.put("title", p.getTitle());
-//            postMap.put("image", p.getImage());
-//            postMap.put("tooltip", p.getMota());
-//            postMap.put("timeAgo", getTimeAgo(p.getCreatedAt()));
-//            postMap.put("link", "/post/" + p.getIdPost());
-//            posts.add(postMap);
-//        }
-//        model.addAttribute("posts", posts);
-//
-//        List<Page> allPages = pageRepository.findAll();
-//        Map<Long, Long> menuToPageMap = new HashMap<>();
-//        for (Page page : allPages) {
-//            if ("Published".equalsIgnoreCase(page.getStatus())) {
-//                menuToPageMap.put(page.getIdMenu(), page.getIdPage());
-//            }
-//        }
-//        model.addAttribute("menuToPageMap", menuToPageMap);
-//        System.out.println("MENU TO PAGE MAP: " + menuToPageMap);
-//
-//        return "Frontend/index";
-//    }
     private boolean isValidImageUrl(String url) {
         return url != null && url.matches("^https?://.*\\.(png|jpg|jpeg|gif|webp)$");
     }
@@ -111,20 +70,38 @@ public class HomeController_FrontEnd {
 
     @GetMapping("/site/{id}")
     public String showHomePage(Model model,@PathVariable("id") Long id) throws IOException {
+        String folderPath = System.getProperty("user.dir") + "/src/main/resources/images/";
+        Path folder = Paths.get(folderPath);
+        for (File file : Objects.requireNonNull(folder.toFile().listFiles())) {
+            if(file.delete()){
+                System.out.println(file.getName());
+            }
+        }
         Optional<Site> siteOpt = siteRepository.findById(id);
         if (siteOpt.isEmpty()) return "redirect:/";
-
         Site site = siteOpt.get();
-        byte [] data = (site.getLogo()).getBytes();
-        System.out.printf("So luong %d/n",data.length);
-//        ByteArrayInputStream bais = new ByteArrayInputStream(data);
-//        BufferedImage bImage = ImageIO.read(bais);
-//        ImageIO.write(bImage, "jpg", new File("/Users/khang912k4/Documents/DoAnMonHoc/src/main/image/output.JPG"));
+        String[] byteArray = (site.getLogo()).substring(1,(site.getLogo()).length()-2).toLowerCase().split(", ");
+        byte[] imageBytes = new byte[byteArray.length];
+        for (int i=0; i<byteArray.length; i++) {
+            imageBytes[i] = Byte.parseByte(byteArray[i]);
+        }
+        System.out.println(imageBytes[0]);
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(imageBytes);
+        BufferedImage bufferedImage = ImageIO.read(byteArrayInputStream);
+        ImageIO.write(bufferedImage,"png",new File(System.getProperty("user.dir") + "/src/main/resources/images/Logo.png"));
         List<Banner> banners = bannerRepository.findByIdSiteOrderByIdBannerAsc(site.getIdSite());
         List<Map<String, String>> bannerList = new ArrayList<>();
         for (Banner b : banners) {
             Map<String, String> bannerMap = new HashMap<>();
-            bannerMap.put("image", b.getImage());
+            String[] byteArray1 = (b.getImage()).substring(1,(b.getImage()).length()-2).toLowerCase().split(", ");
+            byte[] imageBytes1 = new byte[byteArray1.length];
+            for (int i=0; i<byteArray1.length; i++) {
+                imageBytes1[i] = Byte.parseByte(byteArray1[i]);
+            }
+            ByteArrayInputStream byteArrayInputStream1 = new ByteArrayInputStream(imageBytes1);
+            BufferedImage bufferedImage1 = ImageIO.read(byteArrayInputStream1);
+            ImageIO.write(bufferedImage1,"png",new File(System.getProperty("user.dir") + "/src/main/resources/images/SliBanner"+b.getIdBanner()+".png"));
+            bannerMap.put("image", "http://localhost:8888/contents/images/SliBanner"+b.getIdBanner()+".png");
             bannerMap.put("tooltip", b.getMota());
             bannerList.add(bannerMap);
         }
@@ -132,7 +109,7 @@ public class HomeController_FrontEnd {
         List<Menu> menus = menuRepository.findByIdSiteOrderByIdMenuAsc(site.getIdSite());
         model.addAttribute("menus", menus);
         model.addAttribute("site", site);
-        List<Post> allPosts = postRepository.findPublishedPostsByIdSiteOrderByPined(site.getIdSite(),PostStatus.Published);
+        List<Post> allPosts = postRepository.findPublishedPostsByIdSiteOrderByPined(site.getIdSite(), Status.Published);
         List<Map<String, String>> posts = new ArrayList<>();
         if (!allPosts.isEmpty()) {
             Post p = allPosts.get(0);
@@ -148,17 +125,14 @@ public class HomeController_FrontEnd {
             posts.add(postMap);
         }
         model.addAttribute("posts", posts);
-
-        List<Page> allPages = pageRepository.findAll();
         Map<Long, Long> menuToPageMap = new HashMap<>();
-        for (Page page : allPages) {
-            if ("Published".equalsIgnoreCase(page.getStatus())) {
-                menuToPageMap.put(page.getIdMenu(), page.getIdPage());
+        for(Menu menu : menus){
+            for (Page p : pageRepository.findPublishedPagesByIdMenuOrderByCreatedAt(menu.getIdMenu(), Status.Published)) {
+                menuToPageMap.put(menu.getIdMenu(), p.getIdPage());
             }
         }
         model.addAttribute("menuToPageMap", menuToPageMap);
         System.out.println("MENU TO PAGE MAP: " + menuToPageMap);
-
         return "Frontend/index";
     }
     private String getTimeAgo(LocalDateTime createdAt) {
@@ -178,7 +152,7 @@ public class HomeController_FrontEnd {
         model.addAttribute("pageCss", "/css/Frontend/news.css");
 
         List<Map<String, String>> posts = new ArrayList<>();
-        for (Post p : postRepository.findPublishedPostsByIdSiteOrderByPined(id, PostStatus.Published)) {
+        for (Post p : postRepository.findPublishedPostsByIdSiteOrderByPined(id, Status.Published)) {
             Map<String, String> postMap = new HashMap<>();
             postMap.put("title", p.getTitle());
             postMap.put("tooltip", p.getMota());
@@ -193,16 +167,15 @@ public class HomeController_FrontEnd {
         }
         model.addAttribute("posts", posts);
 
-        // Thêm menu
         List<Menu> menus = menuRepository.findByIdSiteOrderByIdMenuAsc(id);
         model.addAttribute("menus", menus);
 
         // Thêm menuToPageMap
-        List<Page> allPages = pageRepository.findAll();
         Map<Long, Long> menuToPageMap = new HashMap<>();
-        for (Page page : allPages) {
-            if ("Published".equalsIgnoreCase(page.getStatus())) {
-                menuToPageMap.put(page.getIdMenu(), page.getIdPage());
+        for(Menu menu : menus){
+            System.out.println(menu.getIdMenu());
+            for (Page p : pageRepository.findPublishedPagesByIdMenuOrderByCreatedAt(menu.getIdMenu(), Status.Published)) {
+                menuToPageMap.put(menu.getIdMenu(), p.getIdPage());
             }
         }
         model.addAttribute("menuToPageMap", menuToPageMap);
@@ -219,7 +192,7 @@ public class HomeController_FrontEnd {
         if (postOpt.isEmpty()) return "redirect:/";
 
         Post post = postOpt.get();
-        if (post.getStatus() != PostStatus.Published) return "redirect:/";
+        if (post.getStatus() != Status.Published) return "redirect:/";
 
         List<Map<String, String>> blocks = new ArrayList<>();
         for (Block block : blockRepository.findByIdPost(post.getIdPost())) {
@@ -246,11 +219,11 @@ public class HomeController_FrontEnd {
         List<Menu> menus = menuRepository.findByIdSiteOrderByIdMenuAsc(site.getIdSite());
         model.addAttribute("menus", menus);
 
-        List<Page> allPages = pageRepository.findAll();
         Map<Long, Long> menuToPageMap = new HashMap<>();
-        for (Page p : allPages) {
-            if ("Published".equalsIgnoreCase(p.getStatus())) {
-                menuToPageMap.put(p.getIdMenu(), p.getIdPage());
+        for(Menu menu : menus){
+            List<Page> allPages = pageRepository.findPublishedPagesByIdMenuOrderByCreatedAt(menu.getIdMenu(), Status.Published);
+            for (Page p : allPages) {
+                menuToPageMap.put(menu.getIdMenu(), p.getIdPage());
             }
         }
         model.addAttribute("menuToPageMap", menuToPageMap);
@@ -263,23 +236,35 @@ public class HomeController_FrontEnd {
         if (pageOpt.isEmpty()) return "redirect:/";
 
         Page page = pageOpt.get();
-        if (!"Published".equalsIgnoreCase(page.getStatus())) return "redirect:/";
+        if (page.getStatus() != Status.Published) return "redirect:/";
 
         List<Map<String, String>> blocks = new ArrayList<>();
         for (Block block : blockRepository.findByIdPage(page.getIdPage())) {
             Map<String, String> blockMap = new HashMap<>();
-            blockMap.put("code",block.getCode());
+            blockMap.put("code", block.getCode());
             blocks.add(blockMap);
         }
 
         model.addAttribute("page", page);
         model.addAttribute("contentHtml", blocks);
 
-        injectCommonModelAttributes(model);
+        Menu menu = menuRepository.findById(page.getIdMenu()).orElse(null);
+        model.addAttribute("menu", menu);
+
+        if (menu != null) {
+            Site site = siteRepository.findById(menu.getIdSite()).orElse(null);
+            model.addAttribute("site", site);
+
+            List<Menu> menus = menuRepository.findByIdSiteOrderByIdMenuAsc(site.getIdSite());
+            model.addAttribute("menus", menus);
+
+            Map<Long, Long> menuToPageMap = new HashMap<>();
+            for (Page p : pageRepository.findPublishedPagesByIdMenuOrderByCreatedAt(menu.getIdMenu(), Status.Published)) {
+                menuToPageMap.put(p.getIdMenu(), p.getIdPage());
+            }
+            model.addAttribute("menuToPageMap", menuToPageMap);
+        }
+
         return "Frontend/page-detail";
     }
-
-
-
-
 }
