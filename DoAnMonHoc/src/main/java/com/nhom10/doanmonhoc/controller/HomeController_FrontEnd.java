@@ -46,10 +46,12 @@ public class HomeController_FrontEnd {
 
     @Autowired
     private PageRepository pageRepository;
-
+//Hàm kiểm tra link ảnh
     private boolean isValidImageUrl(String url) {
         return url != null && url.matches("^https?://.*\\.(png|jpg|jpeg|gif|webp)$");
     }
+
+//Hàm tìm hình anh trong block
     private String extractImageFromBlocks(List<Block> blocks) {
         String fallback = "https://xdcs.cdnchinhphu.vn/446259493575335936/2024/8/17/nhatrang1-17238902889991160055539.jpg";
         for (Block block : blocks) {
@@ -66,7 +68,14 @@ public class HomeController_FrontEnd {
         return fallback;
     }
 
-
+//Hàm lấy thời gian
+    private String getTimeAgo(LocalDateTime createdAt) {
+        Duration duration = Duration.between(createdAt, LocalDateTime.now());
+        if (duration.toMinutes() < 1) return "Vừa đăng";
+        if (duration.toMinutes() < 60) return "Đã đăng " + duration.toMinutes() + " phút trước";
+        if (duration.toHours() < 24) return "Đã đăng " + duration.toHours() + " giờ trước";
+        return "Đã đăng " + duration.toDays() + " ngày trước";
+    }
 
     @GetMapping("/site/{id}")
     public String showHomePage(Model model,@PathVariable("id") Long id) throws IOException {
@@ -135,13 +144,6 @@ public class HomeController_FrontEnd {
         System.out.println("MENU TO PAGE MAP: " + menuToPageMap);
         return "Frontend/index";
     }
-    private String getTimeAgo(LocalDateTime createdAt) {
-        Duration duration = Duration.between(createdAt, LocalDateTime.now());
-        if (duration.toMinutes() < 1) return "Vừa đăng";
-        if (duration.toMinutes() < 60) return "Đã đăng " + duration.toMinutes() + " phút trước";
-        if (duration.toHours() < 24) return "Đã đăng " + duration.toHours() + " giờ trước";
-        return "Đã đăng " + duration.toDays() + " ngày trước";
-    }
 
     @GetMapping("/tin-tuc/{id}")
     public String showAllNews(Model model, @PathVariable("id") Long id) {
@@ -183,9 +185,6 @@ public class HomeController_FrontEnd {
         return "Frontend/news";
     }
 
-
-
-
     @GetMapping("/post/{id}")
     public String showPostDetail(@PathVariable("id") Long id, Model model) {
         Optional<Post> postOpt = postRepository.findById(id);
@@ -212,23 +211,6 @@ public class HomeController_FrontEnd {
         return "Frontend/post-detail";
     }
 
-    private void injectCommonModelAttributes(Model model) {
-        Site site = siteRepository.findFirstByOrderByIdSiteAsc();
-        model.addAttribute("site", site);
-
-        List<Menu> menus = menuRepository.findByIdSiteOrderByIdMenuAsc(site.getIdSite());
-        model.addAttribute("menus", menus);
-
-        Map<Long, Long> menuToPageMap = new HashMap<>();
-        for(Menu menu : menus){
-            List<Page> allPages = pageRepository.findPublishedPagesByIdMenuOrderByCreatedAt(menu.getIdMenu(), Status.Published);
-            for (Page p : allPages) {
-                menuToPageMap.put(menu.getIdMenu(), p.getIdPage());
-            }
-        }
-        model.addAttribute("menuToPageMap", menuToPageMap);
-    }
-
 
     @GetMapping("/page/{id}")
     public String showPage(@PathVariable("id") Long id, Model model) {
@@ -238,33 +220,34 @@ public class HomeController_FrontEnd {
         Page page = pageOpt.get();
         if (page.getStatus() != Status.Published) return "redirect:/";
 
+        Menu menu = menuRepository.findById(page.getIdMenu()).orElse(null);
+        if (menu == null) return "redirect:/";
+        Site site = siteRepository.findById(menu.getIdSite()).orElse(null);
+        if (site == null) return "redirect:/";
+
+        List<Menu> menus = menuRepository.findByIdSiteOrderByIdMenuAsc(site.getIdSite());
+
+        Map<Long, Long> menuToPageMap = new HashMap<>();
+        for (Menu m : menus) {
+            List<Page> pages = pageRepository.findPublishedPagesByIdMenuOrderByCreatedAt(m.getIdMenu(), Status.Published);
+            for (Page p : pages) {
+                menuToPageMap.put(m.getIdMenu(), p.getIdPage());
+            }
+        }
         List<Map<String, String>> blocks = new ArrayList<>();
         for (Block block : blockRepository.findByIdPage(page.getIdPage())) {
             Map<String, String> blockMap = new HashMap<>();
             blockMap.put("code", block.getCode());
             blocks.add(blockMap);
         }
-
         model.addAttribute("page", page);
         model.addAttribute("contentHtml", blocks);
-
-        Menu menu = menuRepository.findById(page.getIdMenu()).orElse(null);
         model.addAttribute("menu", menu);
-
-        if (menu != null) {
-            Site site = siteRepository.findById(menu.getIdSite()).orElse(null);
-            model.addAttribute("site", site);
-
-            List<Menu> menus = menuRepository.findByIdSiteOrderByIdMenuAsc(site.getIdSite());
-            model.addAttribute("menus", menus);
-
-            Map<Long, Long> menuToPageMap = new HashMap<>();
-            for (Page p : pageRepository.findPublishedPagesByIdMenuOrderByCreatedAt(menu.getIdMenu(), Status.Published)) {
-                menuToPageMap.put(p.getIdMenu(), p.getIdPage());
-            }
-            model.addAttribute("menuToPageMap", menuToPageMap);
-        }
-
+        model.addAttribute("site", site);
+        model.addAttribute("menus", menus);
+        model.addAttribute("menuToPageMap", menuToPageMap);
         return "Frontend/page-detail";
     }
+
+
 }
