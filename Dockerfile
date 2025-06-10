@@ -10,6 +10,6 @@ RUN gradle clean build --no-daemon --no-build-cache
 
 # ---- Run Stage ----
 FROM eclipse-temurin:17-jdk
-EXPOSE 8080
+EXPOSE 8888
 COPY --from=build /home/gradle/project/build/libs/*.jar app.jar
 ENTRYPOINT ["java", "-jar", "/app.jar"]
